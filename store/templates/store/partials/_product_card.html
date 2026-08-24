@@ -1,0 +1,47 @@
+<!-- Dynamic Product Card -->
+<div class="group flex flex-col bg-white rounded-lg border border-gray-200 hover:shadow-floating transition-all duration-300 overflow-hidden relative">
+    <!-- Badges -->
+    {% if product.is_featured or forloop.counter == 1 %}
+    <div class="absolute top-3 left-3 z-20">
+        <span class="bg-accent text-white text-[11px] font-semibold px-2 py-1 rounded shadow-sm">
+            Best Selling
+        </span>
+    </div>
+    {% elif forloop.counter == 3 %}
+    <div class="absolute top-3 left-3 z-20">
+        <span class="bg-blue-500 text-white text-[11px] font-semibold px-2 py-1 rounded shadow-sm">
+            Organic
+        </span>
+    </div>
+    {% endif %}
+    
+    <!-- Image Wrapper -->
+    <a href="{% url 'product_detail' product.slug %}" class="relative h-56 w-full flex items-center justify-center p-4 bg-[#f8fafc]">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="object-cover h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center text-gray-300 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+            <i class="fa-solid fa-box text-6xl"></i>
+        </div>
+        {% endif %}
+    </a>
+    
+    <!-- Content -->
+    <div class="p-4 flex flex-col flex-grow border-t border-gray-50">
+        <a href="{% url 'product_detail' product.slug %}">
+            <h3 class="text-[16px] font-semibold text-gray-800 mb-2 truncate hover:text-chashi transition-colors">{{ product.name }}</h3>
+        </a>
+        
+        <!-- Price -->
+        <div class="flex items-center gap-2 mb-4">
+            <span class="text-[18px] font-bold text-accent">৳{{ product.price }}</span>
+        </div>
+        
+        <!-- Action -->
+        <div class="mt-auto">
+            <button onclick="addToCart({{ product.id }})" class="w-full py-2.5 bg-white border border-chashi text-chashi hover:bg-chashi hover:text-white rounded font-semibold transition-colors duration-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cart-plus text-sm"></i> Add To Cart
+            </button>
+        </div>
+    </div>
+</div>

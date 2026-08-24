@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GreenBusket - Fresh Products From Farmers{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chashi: {
+                            light: '#4ade80',
+                            DEFAULT: '#16a34a',
+                            dark: '#15803d',
+                            leaf: '#e6f4ea'
+                        },
+                        accent: {
+                            DEFAULT: '#f97316',
+                            hover: '#ea580c'
+                        },
+                        primary: '#16a34a', /* Mapping primary to chashi for compatibility with existing templates */
+                        secondary: '#f97316',
+                    },
+                    fontFamily: {
+                        sans: ['Hind Siliguri', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'floating': '0 20px 40px -10px rgba(22, 163, 74, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        /* Hide scrollbar for mini cart */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Smooth Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased selection:bg-chashi-light selection:text-white flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="glass-nav shadow-sm fixed w-full top-0 z-40 transition-all duration-300 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Logo -->
+                <a href="/" class="flex-shrink-0 flex items-center cursor-pointer group">
+                    <div class="bg-chashi-leaf p-2 rounded-xl mr-2 group-hover:bg-chashi transition-colors duration-300">
+                        <i class="fa-solid fa-leaf text-chashi group-hover:text-white text-2xl transition-colors"></i>
+                    </div>
+                    <span class="font-extrabold text-2xl text-gray-900 tracking-tight">GREEN<span class="text-chashi">BUSKET</span></span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center bg-gray-50 px-6 py-2 rounded-full border border-gray-100">
+                    {% for cat in nav_categories|slice:":4" %}
+                    <a href="{% url 'shop' %}?category={{ cat.slug }}" class="text-gray-600 hover:text-chashi font-semibold transition-colors">{{ cat.name }}</a>
+                    {% endfor %}
+                    <a href="{% url 'shop' %}" class="text-gray-600 hover:text-chashi font-semibold transition-colors">All Products</a>
+                </div>
+
+                <!-- Icons (Search, Track, Cart) -->
+                <div class="flex items-center space-x-3 sm:space-x-5">
+                    <a href="/shop/" class="w-10 h-10 rounded-full bg-gray-50 text-gray-600 hover:bg-chashi-leaf hover:text-chashi flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-search"></i>
+                    </a>
+                    <a href="/tracking/" class="hidden sm:flex w-10 h-10 rounded-full bg-gray-50 text-gray-600 hover:bg-chashi-leaf hover:text-chashi items-center justify-center transition-colors" title="Track Order">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </a>
+                    <button onclick="toggleCart()" class="w-12 h-12 rounded-full bg-chashi text-white hover:bg-chashi-dark flex items-center justify-center transition-all shadow-md hover:shadow-lg relative transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-bag-shopping text-lg"></i>
+                        <span id="cart-count" class="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full h-6 w-6 border-2 border-white flex items-center justify-center shadow-sm">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-20">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-900 pt-16 pb-8 border-t-[6px] border-chashi mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                
+                <!-- Brand Info -->
+                <div>
+                    <div class="flex items-center group mb-6">
+                        <div class="bg-chashi-dark p-2 rounded-xl mr-2">
+                            <i class="fa-solid fa-leaf text-white text-2xl"></i>
+                        </div>
+                        <span class="font-extrabold text-2xl text-white tracking-tight">GREEN<span class="text-chashi">BUSKET</span></span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Bridging the gap between honest farmers and conscious consumers. Delivering 100% authentic, chemical-free products straight to your kitchen.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-chashi hover:text-white transition-colors">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-chashi hover:text-white transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-chashi hover:text-white transition-colors">
+                            <i class="fa-brands fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-6 tracking-wide">Explore Categories</h4>
+                    <ul class="space-y-4">
+                        {% for cat in nav_categories %}
+                        <li><a href="{% url 'shop' %}?category={{ cat.slug }}" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-angle-right text-xs mr-2"></i> {{ cat.name }}</a></li>
+                        {% endfor %}
+                        <li><a href="{% url 'shop' %}" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-angle-right text-xs mr-2"></i> All Products</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Support -->
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-6 tracking-wide">Customer Support</h4>
+                    <ul class="space-y-4">
+                        <li><a href="/tracking/" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-truck-fast text-xs mr-2"></i> Track Your Order</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-file-invoice text-xs mr-2"></i> Download Invoice</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-circle-question text-xs mr-2"></i> FAQ & Help</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-arrow-right-arrow-left text-xs mr-2"></i> Return Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-chashi transition-colors flex items-center"><i class="fa-solid fa-shield-halved text-xs mr-2"></i> Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact & Payment -->
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-6 tracking-wide">Contact Us</h4>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start text-gray-400">
+                            <i class="fa-solid fa-location-dot mt-1.5 mr-3 text-chashi"></i>
+                            <span>12/A, Farm View Avenue,<br>Rajshahi, Bangladesh</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa-solid fa-phone mr-3 text-chashi"></i>
+                            <span>+880 1700-000000</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa-solid fa-envelope mr-3 text-chashi"></i>
+                            <span>support@greenbusket.com</span>
+                        </li>
+                    </ul>
+                    <h4 class="text-white font-bold text-sm mb-4 tracking-wide">Payment Methods</h4>
+                    <div class="flex space-x-2">
+                        <div class="bg-gray-800 px-3 py-1.5 rounded text-xs font-bold text-white border border-gray-700">Cash on Delivery</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                    &copy; {% now "Y" %} GreenBusket E-commerce. All rights reserved.
+                </p>
+                <div class="text-gray-500 text-sm">
+                    Designed with <i class="fa-solid fa-heart text-red-500 mx-1"></i> for Farmers.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mini Cart (Offcanvas/Drawer) -->
+    <div id="miniCartOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden transition-all duration-500 opacity-0" onclick="toggleCart()"></div>
+    
+    <div id="miniCart" class="fixed inset-y-0 right-0 w-full max-w-md bg-slate-50 shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] z-50 transform translate-x-full transition-transform duration-500 flex flex-col sm:rounded-l-[2rem] overflow-hidden">
+        
+        <!-- Cart Header -->
+        <div class="flex items-center justify-between p-6 bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-gray-100/60 shadow-sm">
+            <h2 class="text-2xl font-extrabold text-gray-900 flex items-center gap-3">
+                <div class="bg-gradient-to-br from-chashi-light to-chashi p-2.5 rounded-xl shadow-md shadow-chashi-light/30 text-white relative">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                My Cart
+            </h2>
+            <button onclick="toggleCart()" class="group bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-500 transition-all duration-300 rounded-full h-10 w-10 flex items-center justify-center">
+                <i class="fa-solid fa-times text-lg group-hover:rotate-90 transition-transform duration-300"></i>
+            </button>
+        </div>
+        
+        <!-- Cart Items -->
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 no-scrollbar space-y-5 bg-slate-50/50">
+            <!-- Dynamic Cart Items injected here -->
+            <div class="text-center text-gray-400 mt-10">
+                <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
+                <p>Your cart is empty.</p>
+            </div>
+        </div>
+
+        <!-- Cart Footer -->
+        <div class="border-t border-gray-200/60 p-6 bg-white shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)] z-20">
+            <div class="flex justify-between mb-6 font-extrabold text-xl text-gray-900">
+                <span>Subtotal</span>
+                <span id="cart-subtotal" class="text-chashi-dark">৳ 0.00</span>
+            </div>
+            <a href="/checkout" class="w-full block text-center bg-chashi text-white font-bold py-4 rounded-xl hover:bg-chashi-dark transition-all shadow-floating hover:-translate-y-1">
+                Proceed to Checkout
+            </a>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCart();
+        });
+
+        function toggleCart() {
+            const sidebar = document.getElementById('miniCart');
+            const overlay = document.getElementById('miniCartOverlay');
+            
+            if (sidebar.classList.contains('translate-x-full')) {
+                // Open
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                fetchCart();
+            } else {
+                // Close
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 500);
+            }
+        }
+
+        async function fetchCart() {
+            try {
+                const response = await fetch('/cart/api/');
+                const data = await response.json();
+                updateCartUI(data);
+            } catch (error) {
+                console.error("Error fetching cart", error);
+            }
+        }
+        
+        function updateCartUI(data) {
+            const countElem = document.getElementById('cart-count');
+            const subtotalElem = document.getElementById('cart-subtotal');
+            const itemsContainer = document.getElementById('cart-items');
+            
+            if(!data) return;
+            
+            countElem.innerText = data.total_items || 0;
+            subtotalElem.innerText = `৳ ${data.total_price || '0.00'}`;
+            
+            if(data.items && data.items.length > 0) {
+                itemsContainer.innerHTML = data.items.map(item => `
+                    <div class="group relative flex gap-4 bg-white p-4 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] border border-gray-100 hover:border-chashi/30 hover:shadow-[0_8px_30px_-4px_rgba(22,163,74,0.1)] transition-all duration-300">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-1 bg-chashi rounded-r-full group-hover:h-3/4 transition-all duration-300"></div>
+                        
+                        <div class="w-24 h-24 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-50 relative group-hover:scale-105 transition-transform duration-500">
+                            <img src="${item.image_url || '/static/images/placeholder.jpg'}" class="w-full h-full object-cover" alt="${item.name}">
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col justify-center">
+                            <div class="flex justify-between items-start">
+                                <div class="pr-6">
+                                    <h4 class="text-base font-extrabold text-gray-900 leading-tight group-hover:text-chashi transition-colors">${item.name}</h4>
+                                    <p class="text-sm text-gray-500 mt-1">${item.variant_name || ''}</p>
+                                </div>
+                                <button onclick="updateCartItem(${item.product_id}, 0)" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-red-50 text-red-400 opacity-0 group-hover:opacity-100 group-hover:text-red-600 hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center justify-center transform translate-x-2 group-hover:translate-x-0">
+                                    <i class="fa-solid fa-trash-can text-sm"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-end justify-between mt-4">
+                                <span class="text-lg font-black text-chashi-dark">৳${item.price}</span>
+                                
+                                <div class="flex items-center space-x-1 bg-gray-50 border border-gray-100 rounded-full p-1 shadow-inner">
+                                    <button onclick="updateCartItem(${item.product_id}, ${item.quantity - 1})" class="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-chashi hover:bg-chashi-leaf transition-colors"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                                    <span class="text-sm font-bold w-6 text-center text-gray-800">${item.quantity}</span>
+                                    <button onclick="updateCartItem(${item.product_id}, ${item.quantity + 1})" class="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-chashi hover:bg-chashi-leaf transition-colors"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                itemsContainer.innerHTML = `
+                    <div class="text-center text-gray-400 mt-10">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
+                        <p>Your cart is empty.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function addToCart(productId, variantId = null, quantity = 1) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/cart/add/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        variant_id: variantId,
+                        quantity: quantity
+                    })
+                });
+                const data = await response.json();
+                updateCartUI(data);
+                
+                // Show sliding cart automatically after adding
+                const sidebar = document.getElementById('miniCart');
+                if (sidebar.classList.contains('translate-x-full')) {
+                    toggleCart();
+                }
+            } catch (error) {
+                console.error("Error adding to cart", error);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function updateCartItem(productId, quantity) {
+            try {
+                const response = await fetch('/cart/update/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: quantity
+                    })
+                });
+                const data = await response.json();
+                updateCartUI(data);
+            } catch (error) {
+                console.error("Error updating cart", error);
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

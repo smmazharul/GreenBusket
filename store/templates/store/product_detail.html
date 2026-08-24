@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} - GreenBusket{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-[calc(100vh-200px)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="lg:grid lg:grid-cols-2 lg:gap-x-12">
+            <!-- Product Image -->
+            <div class="rounded-2xl overflow-hidden bg-gray-50 h-[400px] lg:h-[500px] border border-gray-100 shadow-sm">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-gray-300">
+                    <i class="fa-solid fa-image text-9xl"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Product Info -->
+            <div class="mt-10 px-4 sm:px-0 lg:mt-0 flex flex-col justify-center">
+                <p class="text-primary font-bold tracking-wider uppercase text-sm mb-2">{{ product.category.name }}</p>
+                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900">{{ product.name }}</h1>
+                <p class="text-sm text-gray-500 mt-2">SKU: {{ product.sku }}</p>
+                
+                <div class="mt-6">
+                    <p class="text-4xl text-gray-900 font-bold">৳ {{ product.price }}</p>
+                </div>
+
+                <!-- Variants if any -->
+                {% if product.variants.exists %}
+                <div class="mt-8">
+                    <h3 class="text-sm text-gray-900 font-bold mb-3">Available Options</h3>
+                    <div class="flex gap-3 flex-wrap">
+                        {% for variant in product.variants.all %}
+                        <button class="border-2 border-gray-200 rounded-xl px-5 py-3 text-gray-700 hover:border-primary hover:text-primary transition-all font-medium focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
+                            {{ variant.name }} <span class="text-sm text-gray-500 block">+৳{{ variant.price_adjustment }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="mt-8">
+                    <div class="flex items-center gap-6">
+                        <div class="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden h-14">
+                            <button class="px-5 text-xl text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors h-full" onclick="updateQty(-1)">-</button>
+                            <input type="number" id="qty" value="1" min="1" max="{{ product.stock }}" class="w-16 text-center border-none focus:outline-none focus:ring-0 text-lg font-semibold bg-transparent">
+                            <button class="px-5 text-xl text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors h-full" onclick="updateQty(1)">+</button>
+                        </div>
+                        <p class="text-sm font-medium {% if product.stock > 0 %}text-green-600{% else %}text-red-500{% endif %}">
+                            {% if product.stock > 0 %}
+                                <i class="fa-solid fa-circle-check mr-1"></i> {{ product.stock }} in stock
+                            {% else %}
+                                <i class="fa-solid fa-circle-xmark mr-1"></i> Out of stock
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-10 flex gap-4 flex-col sm:flex-row">
+                    <!-- Add to Cart (Session) -->
+                    <button onclick="addToCart({{ product.id }}, null, parseInt(document.getElementById('qty').value))" 
+                            class="flex-1 bg-white border-2 border-primary text-primary px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-50 transition-colors flex items-center justify-center gap-3 shadow-sm"
+                            {% if product.stock <= 0 %}disabled{% endif %}>
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                    </button>
+                    <!-- Buy Now (Express Checkout) -->
+                    <!-- Note: URL 'checkout_buy_now' will be created in Phase 04 -->
+                    <form action="/checkout/buy-now/{{ product.id }}/" method="POST" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" id="buy_now_qty" value="1">
+                        <button type="submit" 
+                                class="w-full bg-secondary text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-amber-600 transition-colors shadow-md hover:shadow-xl flex items-center justify-center gap-3"
+                                {% if product.stock <= 0 %}disabled{% endif %}>
+                            <i class="fa-solid fa-bolt"></i> Buy Now
+                        </button>
+                    </form>
+                </div>
+
+                <div class="mt-12 pt-8 border-t border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Product Details</h3>
+                    <div class="prose prose-sm md:prose-base text-gray-600">
+                        {{ product.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    function updateQty(change) {
+        const qtyInput = document.getElementById('qty');
+        const buyNowQty = document.getElementById('buy_now_qty');
+        let current = parseInt(qtyInput.value) || 1;
+        let max = parseInt(qtyInput.getAttribute('max')) || 1;
+        let next = current + change;
+        if (next >= 1 && next <= max) {
+            qtyInput.value = next;
+            buyNowQty.value = next;
+        }
+    }
+</script>
+{% endblock %}
