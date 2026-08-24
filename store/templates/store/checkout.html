@@ -25,7 +25,94 @@
                         <label class="block text-sm font-bold text-gray-700 mb-2">Full Address *</label>
                         <textarea name="address" required rows="3" placeholder="House/Road, Area" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none"></textarea>
                     </div>
+                    
+                    <div class="mb-8">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">District/City *</label>
+                        <select name="district" id="district" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white">
+                            <option value="">Select District</option>
+                            <optgroup label="Dhaka Division">
+                                <option value="Dhaka">Dhaka</option>
+                                <option value="Faridpur">Faridpur</option>
+                                <option value="Gazipur">Gazipur</option>
+                                <option value="Gopalganj">Gopalganj</option>
+                                <option value="Kishoreganj">Kishoreganj</option>
+                                <option value="Madaripur">Madaripur</option>
+                                <option value="Manikganj">Manikganj</option>
+                                <option value="Munshiganj">Munshiganj</option>
+                                <option value="Narayanganj">Narayanganj</option>
+                                <option value="Narsingdi">Narsingdi</option>
+                                <option value="Rajbari">Rajbari</option>
+                                <option value="Shariatpur">Shariatpur</option>
+                                <option value="Tangail">Tangail</option>
+                            </optgroup>
+                            <optgroup label="Chattogram Division">
+                                <option value="Bandarban">Bandarban</option>
+                                <option value="Brahmanbaria">Brahmanbaria</option>
+                                <option value="Chandpur">Chandpur</option>
+                                <option value="Chattogram">Chattogram</option>
+                                <option value="Comilla">Comilla</option>
+                                <option value="Cox's Bazar">Cox's Bazar</option>
+                                <option value="Feni">Feni</option>
+                                <option value="Khagrachari">Khagrachari</option>
+                                <option value="Lakshmipur">Lakshmipur</option>
+                                <option value="Noakhali">Noakhali</option>
+                                <option value="Rangamati">Rangamati</option>
+                            </optgroup>
+                            <optgroup label="Rajshahi Division">
+                                <option value="Bogura">Bogura</option>
+                                <option value="Joypurhat">Joypurhat</option>
+                                <option value="Naogaon">Naogaon</option>
+                                <option value="Natore">Natore</option>
+                                <option value="Chapainawabganj">Chapainawabganj</option>
+                                <option value="Pabna">Pabna</option>
+                                <option value="Rajshahi">Rajshahi</option>
+                                <option value="Sirajganj">Sirajganj</option>
+                            </optgroup>
+                            <optgroup label="Khulna Division">
+                                <option value="Bagerhat">Bagerhat</option>
+                                <option value="Chuadanga">Chuadanga</option>
+                                <option value="Jashore">Jashore</option>
+                                <option value="Jhenaidah">Jhenaidah</option>
+                                <option value="Khulna">Khulna</option>
+                                <option value="Kushtia">Kushtia</option>
+                                <option value="Magura">Magura</option>
+                                <option value="Meherpur">Meherpur</option>
+                                <option value="Narail">Narail</option>
+                                <option value="Satkhira">Satkhira</option>
+                            </optgroup>
+                            <optgroup label="Barishal Division">
+                                <option value="Barguna">Barguna</option>
+                                <option value="Barishal">Barishal</option>
+                                <option value="Bhola">Bhola</option>
+                                <option value="Jhalokati">Jhalokati</option>
+                                <option value="Patuakhali">Patuakhali</option>
+                                <option value="Pirojpur">Pirojpur</option>
+                            </optgroup>
+                            <optgroup label="Sylhet Division">
+                                <option value="Habiganj">Habiganj</option>
+                                <option value="Moulvibazar">Moulvibazar</option>
+                                <option value="Sunamganj">Sunamganj</option>
+                                <option value="Sylhet">Sylhet</option>
+                            </optgroup>
+                            <optgroup label="Rangpur Division">
+                                <option value="Dinajpur">Dinajpur</option>
+                                <option value="Gaibandha">Gaibandha</option>
+                                <option value="Kurigram">Kurigram</option>
+                                <option value="Lalmonirhat">Lalmonirhat</option>
+                                <option value="Nilphamari">Nilphamari</option>
+                                <option value="Panchagarh">Panchagarh</option>
+                                <option value="Rangpur">Rangpur</option>
+                                <option value="Thakurgaon">Thakurgaon</option>
+                            </optgroup>
+                            <optgroup label="Mymensingh Division">
+                                <option value="Jamalpur">Jamalpur</option>
+                                <option value="Mymensingh">Mymensingh</option>
+                                <option value="Netrokona">Netrokona</option>
+                                <option value="Sherpur">Sherpur</option>
+                            </optgroup>
+                        </select>
                     </div>
+
                     <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">Payment Method</h2>
                     <div class="mb-8 p-4 border border-emerald-200 bg-emerald-50 rounded-xl flex items-center gap-4">
                         <input type="radio" checked disabled class="w-5 h-5 text-primary">
@@ -71,15 +158,31 @@
                     </div>
                     <div class="flex justify-between text-gray-600">
                         <span>Delivery Charge</span>
-                        <span>৳<span id="summary-delivery">{{ delivery_charge }}</span></span>
+                        <span>৳<span id="summary-delivery">0</span></span>
                     </div>
                     <div class="flex justify-between text-xl font-bold text-gray-900 pt-4 border-t border-gray-200">
                         <span>Total</span>
-                        <span>৳<span id="summary-total">{{ total }}</span></span>
+                        <span>৳<span id="summary-total">{{ subtotal }}</span></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('district').addEventListener('change', function(e) {
+        let charge = 0;
+        if(e.target.value === 'Dhaka') {
+            charge = 60;
+        } else if (e.target.value !== '') {
+            charge = 120;
+        }
+        document.getElementById('summary-delivery').innerText = charge;
+        let sub = parseFloat(document.getElementById('summary-subtotal').innerText);
+        document.getElementById('summary-total').innerText = sub + charge;
+    });
+</script>
 {% endblock %}
