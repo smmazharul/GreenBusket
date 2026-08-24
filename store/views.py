@@ -130,9 +130,9 @@ def checkout(request):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
-        district = request.POST.get('district')
+        district = ""
         
-        delivery_charge = 60 if district.strip().lower() == 'dhaka' else 120
+        delivery_charge = 60
         total_amount = subtotal + delivery_charge
         
         date_str = datetime.datetime.now().strftime('%Y%m%d')
@@ -168,9 +168,14 @@ def checkout(request):
             
         return redirect('order_success', order_id=order.order_id)
         
+    delivery_charge = 60
+    total = subtotal + delivery_charge
     return render(request, 'store/checkout.html', {
         'items': items,
-        'subtotal': subtotal
+        'subtotal': subtotal,
+        'delivery_charge': delivery_charge,
+        'total': total,
+        'buy_now': buy_now_item
     })
 
 def order_success(request, order_id):
