@@ -1,0 +1,20 @@
+databases:
+  - name: greenshop-db
+    databaseName: greenshop
+    user: greenshop_user
+
+services:
+  - type: web
+    name: greenshop
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn chashibhai.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: greenshop-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
